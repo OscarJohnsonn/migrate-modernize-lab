@@ -30,7 +30,7 @@
                     </div>
                 </div>
                 <div class="card-body text-center">
-                    <img th:src="@{'/storage/view/' + ${object.key}}" class="img-fluid" alt="Image preview" style="max-height: 70vh;">
+                    <img th:src="@{'/storage/view/' + ${object.key}}" class="img-fluid" th:alt="${'Full image view of ' + object.name}" style="max-height: 70vh;">
                 </div>
                 <div class="card-footer">
                     <div class="row">

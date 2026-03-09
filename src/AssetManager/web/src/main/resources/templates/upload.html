@@ -13,10 +13,10 @@
             
             <!-- Drag and drop area -->
             <div class="mt-4 mb-4">
-                <div id="dropZone" class="border border-dashed border-secondary rounded p-5 text-center">
+                <div id="dropZone" class="border border-dashed border-secondary rounded p-5 text-center" role="button" tabindex="0" aria-label="Drag and drop image upload area" aria-describedby="dropZoneHelp">
                     <i class="bi bi-cloud-upload" style="font-size: 2rem;"></i>
                     <p class="mt-2">Drag and drop your image here</p>
-                    <p class="text-muted">(or use the file selector above)</p>
+                    <p class="text-muted" id="dropZoneHelp">(or use the file selector above)</p>
                 </div>
             </div>
             
@@ -79,6 +79,12 @@
             // Click on drop zone to trigger file input
             dropZone.addEventListener('click', function() {
                 fileInput.click();
+            });
+            dropZone.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter' || event.key === ' ' || event.code === 'Space') {
+                    event.preventDefault();
+                    fileInput.click();
+                }
             });
             
             function preventDefaults(e) {
