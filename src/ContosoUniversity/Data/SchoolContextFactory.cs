@@ -13,9 +13,19 @@ namespace ContosoUniversity.Data
         {
             var optionsBuilder = new DbContextOptionsBuilder<SchoolContext>();
             
-            // Use a default connection string for design-time (migrations)
+            // Build configuration to read connection string
+            IConfigurationRoot configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json")
+                .AddJsonFile("appsettings.Development.json", optional: true)
+                .AddEnvironmentVariables()
+                .Build();
+            
+            var connectionString = configuration.GetConnectionString("DefaultConnection");
+            
+            // Use SQL Server for Azure deployment
             // At runtime, DI will provide the actual connection string from appsettings.json
-            optionsBuilder.UseSqlServer("Data Source=(LocalDb)\\MSSQLLocalDB;Initial Catalog=ContosoUniversityNoAuthEFCore;Integrated Security=True;MultipleActiveResultSets=True");
+            optionsBuilder.UseSqlServer(connectionString ?? "Server=tcp:localhost;Database=ContosoUniversity;Trusted_Connection=True;TrustServerCertificate=True");
             
             return new SchoolContext(optionsBuilder.Options);
         }
