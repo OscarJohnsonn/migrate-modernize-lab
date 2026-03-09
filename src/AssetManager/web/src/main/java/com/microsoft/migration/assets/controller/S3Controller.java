@@ -4,6 +4,7 @@ import com.microsoft.migration.assets.constants.StorageConstants;
 import com.microsoft.migration.assets.model.S3StorageItem;
 import com.microsoft.migration.assets.service.StorageService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -22,6 +23,7 @@ import java.util.Optional;
 @Controller
 @RequestMapping("/" + StorageConstants.STORAGE_PATH)
 @RequiredArgsConstructor
+@Slf4j
 public class S3Controller {
 
     private final StorageService storageService;
@@ -45,12 +47,17 @@ public class S3Controller {
                 redirectAttributes.addFlashAttribute("error", "Please select a file to upload");
                 return "redirect:/" + StorageConstants.STORAGE_PATH + "/upload";
             }
+            if (!isSupportedImageUpload(file)) {
+                redirectAttributes.addFlashAttribute("error", "Only image files are allowed");
+                return "redirect:/" + StorageConstants.STORAGE_PATH + "/upload";
+            }
 
             storageService.uploadObject(file);
             redirectAttributes.addFlashAttribute("success", "File uploaded successfully");
             return "redirect:/" + StorageConstants.STORAGE_PATH;
         } catch (IOException e) {
-            redirectAttributes.addFlashAttribute("error", "Failed to upload file: " + e.getMessage());
+            log.warn("Failed to upload file", e);
+            redirectAttributes.addFlashAttribute("error", "Failed to upload file");
             return "redirect:/" + StorageConstants.STORAGE_PATH + "/upload";
         }
     }
@@ -71,7 +78,8 @@ public class S3Controller {
                 return "redirect:/" + StorageConstants.STORAGE_PATH;
             }
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Failed to view image: " + e.getMessage());
+            log.warn("Failed to view image '{}'", key, e);
+            redirectAttributes.addFlashAttribute("error", "Failed to view image");
             return "redirect:/" + StorageConstants.STORAGE_PATH;
         }
     }
@@ -99,8 +107,14 @@ public class S3Controller {
             storageService.deleteObject(key);
             redirectAttributes.addFlashAttribute("success", "File deleted successfully");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Failed to delete file: " + e.getMessage());
+            log.warn("Failed to delete file '{}'", key, e);
+            redirectAttributes.addFlashAttribute("error", "Failed to delete file");
         }
         return "redirect:/" + StorageConstants.STORAGE_PATH;
+    }
+
+    private boolean isSupportedImageUpload(MultipartFile file) {
+        String contentType = file.getContentType();
+        return contentType != null && contentType.toLowerCase().startsWith("image/");
     }
 }

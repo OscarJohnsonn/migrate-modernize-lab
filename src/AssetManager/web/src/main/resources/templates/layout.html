@@ -29,11 +29,11 @@
             </div>
         </header>
 
-        <div th:if="${success}" class="alert alert-success" role="alert">
+        <div th:if="${success}" class="alert alert-success" role="status" aria-live="polite">
             <span th:text="${success}">Success message</span>
         </div>
 
-        <div th:if="${error}" class="alert alert-danger" role="alert">
+        <div th:if="${error}" class="alert alert-danger" role="alert" aria-live="assertive">
             <span th:text="${error}">Error message</span>
         </div>
         
