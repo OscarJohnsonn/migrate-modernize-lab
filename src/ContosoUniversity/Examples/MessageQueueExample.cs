@@ -53,9 +53,9 @@ namespace ContosoUniversity.Examples
                 Console.WriteLine($"Created by: {notification.CreatedBy} at {notification.CreatedAt}");
                 Console.WriteLine("---");
             }
-            */
-
+            
             notificationService.Dispose();
+            */
         }
 
         public async Task AsyncQueueOperations()

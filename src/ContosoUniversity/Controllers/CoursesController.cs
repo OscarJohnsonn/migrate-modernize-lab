@@ -53,7 +53,7 @@ namespace ContosoUniversity.Controllers
         // POST: Courses/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create([Bind("CourseID,Title,Credits,DepartmentID,TeachingMaterialImagePath")] Course course, IFormFile teachingMaterialImage)
+        public async Task<IActionResult> Create([Bind("CourseID,Title,Credits,DepartmentID,TeachingMaterialImagePath")] Course course, IFormFile teachingMaterialImage)
         {
             if (ModelState.IsValid)
             {
@@ -93,7 +93,10 @@ namespace ContosoUniversity.Controllers
                         var filePath = Path.Combine(uploadsPath, fileName);
 
                         // Save file
-                        teachingMaterialImage.CopyToAsync(new FileStream(filePath);
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await teachingMaterialImage.CopyToAsync(stream);
+                        }
                         course.TeachingMaterialImagePath = $"~/Uploads/TeachingMaterials/{fileName}";
                     }
                     catch (Exception ex)
@@ -136,7 +139,7 @@ namespace ContosoUniversity.Controllers
         // POST: Courses/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit([Bind("CourseID,Title,Credits,DepartmentID,TeachingMaterialImagePath")] Course course, IFormFile teachingMaterialImage)
+        public async Task<IActionResult> Edit([Bind("CourseID,Title,Credits,DepartmentID,TeachingMaterialImagePath")] Course course, IFormFile teachingMaterialImage)
         {
             if (ModelState.IsValid)
             {
@@ -186,7 +189,10 @@ namespace ContosoUniversity.Controllers
                         }
 
                         // Save new file
-                        teachingMaterialImage.CopyToAsync(new FileStream(filePath);
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await teachingMaterialImage.CopyToAsync(stream);
+                        }
                         course.TeachingMaterialImagePath = $"~/Uploads/TeachingMaterials/{fileName}";
                     }
                     catch (Exception ex)
