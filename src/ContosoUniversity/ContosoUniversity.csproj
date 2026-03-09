@@ -27,6 +27,7 @@
     <!-- Exclude old legacy files that will be removed -->
     <Compile Remove="Global.asax.cs" />
     <Compile Remove="App_Start\**" />
+    <Compile Remove="Properties\AssemblyInfo.cs" />
     <Content Remove="Global.asax" />
     <Content Remove="Web.Debug.config" />
     <Content Remove="Web.Release.config" />
