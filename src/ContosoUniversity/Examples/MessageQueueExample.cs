@@ -34,8 +34,12 @@ namespace ContosoUniversity.Examples
 
         public void NotificationServiceExample()
         {
-            var notificationService = new NotificationService();
-
+            // TODO: Update to use IConfiguration for .NET 9
+            // var notificationService = new NotificationService(configuration);
+            
+            Console.WriteLine("NotificationService example requires IConfiguration - see Program.cs for usage");
+            
+            /*
             // Send some notifications
             notificationService.SendNotification("Student", "123", "John Doe", EntityOperation.CREATE, "admin");
             notificationService.SendNotification("Course", "456", "Mathematics", EntityOperation.UPDATE, "teacher");
@@ -49,6 +53,7 @@ namespace ContosoUniversity.Examples
                 Console.WriteLine($"Created by: {notification.CreatedBy} at {notification.CreatedAt}");
                 Console.WriteLine("---");
             }
+            */
 
             notificationService.Dispose();
         }

@@ -27,7 +27,7 @@ builder.Services.AddMemoryCache();
 
 // Register application services
 builder.Services.AddScoped<ContosoUniversity.Services.NotificationService>();
-builder.Services.AddScoped<ContosoUniversity.Services.LoggingService>();
+// builder.Services.AddScoped<ContosoUniversity.Services.LoggingService>(); // TODO: Implement LoggingService
 
 var app = builder.Build();
 

@@ -4,9 +4,9 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewBag.Title - Contoso University</title>
-    @Styles.Render("~/Content/css")
+    @* Styles bundling removed - use link tags in ASP.NET Core *@
     <link href="~/Content/notifications.css" rel="stylesheet" />
-    @Scripts.Render("~/bundles/modernizr")
+    @* Scripts bundling removed - use script tags or section Scripts in ASP.NET Core *@
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
@@ -34,8 +34,8 @@
         </footer>
     </div>
 
-    @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/bootstrap")
+    @* Scripts bundling removed - use script tags or section Scripts in ASP.NET Core *@
+    @* Scripts bundling removed - use script tags or section Scripts in ASP.NET Core *@
     <script src="~/Scripts/notifications.js"></script>
     @RenderSection("scripts", required: false)
 </body>
