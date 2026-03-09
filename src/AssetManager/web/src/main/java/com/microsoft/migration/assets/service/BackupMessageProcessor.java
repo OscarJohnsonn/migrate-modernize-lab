@@ -2,7 +2,8 @@ package com.microsoft.migration.assets.service;
 
 import com.microsoft.migration.assets.model.ImageProcessingMessage;
 import com.rabbitmq.client.Channel;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.support.AmqpHeaders;
 import org.springframework.messaging.handler.annotation.Header;
@@ -18,10 +19,11 @@ import java.io.IOException;
  * 
  * Only enabled when the "backup" profile is active.
  */
-@Slf4j
 @Component
 @Profile("backup") 
 public class BackupMessageProcessor {
+    
+    private static final Logger log = LoggerFactory.getLogger(BackupMessageProcessor.class);
 
     /**
      * Processes image messages from a backup queue for monitoring and resilience purposes.

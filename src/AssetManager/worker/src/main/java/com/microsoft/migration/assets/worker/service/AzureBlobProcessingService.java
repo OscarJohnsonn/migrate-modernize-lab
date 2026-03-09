@@ -1,15 +1,12 @@
 package com.microsoft.migration.assets.worker.service;
 
+import com.azure.storage.blob.BlobClient;
+import com.azure.storage.blob.BlobContainerClient;
+import com.azure.storage.blob.BlobServiceClient;
 import com.microsoft.migration.assets.worker.repository.ImageMetadataRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
-import software.amazon.awssdk.core.sync.RequestBody;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.GetUrlRequest;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -18,35 +15,37 @@ import java.nio.file.StandardCopyOption;
 
 @Service
 @Profile("!dev")
-@RequiredArgsConstructor
-public class S3FileProcessingService extends AbstractFileProcessingService {
-    private final S3Client s3Client;
+public class AzureBlobProcessingService extends AbstractFileProcessingService {
+    private final BlobServiceClient blobServiceClient;
     private final ImageMetadataRepository imageMetadataRepository;
     
-    @Value("${aws.s3.bucket}")
-    private String bucketName;
+    @Value("${spring.cloud.azure.storage.blob.container-name}")
+    private String containerName;
+
+    public AzureBlobProcessingService(BlobServiceClient blobServiceClient,
+                                      ImageMetadataRepository imageMetadataRepository) {
+        this.blobServiceClient = blobServiceClient;
+        this.imageMetadataRepository = imageMetadataRepository;
+    }
 
     @Override
     public void downloadOriginal(String key, Path destination) throws Exception {
-        GetObjectRequest request = GetObjectRequest.builder()
-                .bucket(bucketName)
-                .key(key)
-                .build();
+        BlobContainerClient containerClient = blobServiceClient.getBlobContainerClient(containerName);
+        BlobClient blobClient = containerClient.getBlobClient(key);
                 
-        try (InputStream inputStream = s3Client.getObject(request)) {
+        try (InputStream inputStream = blobClient.openInputStream()) {
             Files.copy(inputStream, destination, StandardCopyOption.REPLACE_EXISTING);
         }
     }
 
     @Override
     public void uploadThumbnail(Path source, String key, String contentType) throws Exception {
-        PutObjectRequest request = PutObjectRequest.builder()
-                .bucket(bucketName)
-                .key(key)
-                .contentType(contentType)
-                .build();
+        BlobContainerClient containerClient = blobServiceClient.getBlobContainerClient(containerName);
+        BlobClient blobClient = containerClient.getBlobClient(key);
                 
-        s3Client.putObject(request, RequestBody.fromFile(source));
+        blobClient.uploadFromFile(source.toString(), true);
+        blobClient.setHttpHeaders(new com.azure.storage.blob.models.BlobHttpHeaders()
+                .setContentType(contentType));
 
         // Extract the original key from the thumbnail key
         String originalKey = extractOriginalKey(key);
@@ -64,16 +63,14 @@ public class S3FileProcessingService extends AbstractFileProcessingService {
 
     @Override
     public String getStorageType() {
-        return "s3";
+        return "azure-blob";
     }
 
     @Override
     protected String generateUrl(String key) {
-        GetUrlRequest request = GetUrlRequest.builder()
-                .bucket(bucketName)
-                .key(key)
-                .build();
-        return s3Client.utilities().getUrl(request).toString();
+        BlobContainerClient containerClient = blobServiceClient.getBlobContainerClient(containerName);
+        BlobClient blobClient = containerClient.getBlobClient(key);
+        return blobClient.getBlobUrl();
     }
 
     private String extractOriginalKey(String key) {

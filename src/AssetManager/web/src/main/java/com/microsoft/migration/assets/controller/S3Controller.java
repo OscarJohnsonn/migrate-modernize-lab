@@ -3,7 +3,6 @@ package com.microsoft.migration.assets.controller;
 import com.microsoft.migration.assets.constants.StorageConstants;
 import com.microsoft.migration.assets.model.S3StorageItem;
 import com.microsoft.migration.assets.service.StorageService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -21,10 +20,13 @@ import java.util.Optional;
 
 @Controller
 @RequestMapping("/" + StorageConstants.STORAGE_PATH)
-@RequiredArgsConstructor
 public class S3Controller {
 
     private final StorageService storageService;
+
+    public S3Controller(StorageService storageService) {
+        this.storageService = storageService;
+    }
 
     @GetMapping
     public String listObjects(Model model) {

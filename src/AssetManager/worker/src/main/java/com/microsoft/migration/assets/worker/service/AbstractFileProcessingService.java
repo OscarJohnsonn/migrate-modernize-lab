@@ -3,7 +3,8 @@ package com.microsoft.migration.assets.worker.service;
 import com.microsoft.migration.assets.worker.model.ImageProcessingMessage;
 import com.microsoft.migration.assets.worker.util.StorageUtil;
 import com.rabbitmq.client.Channel;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.support.AmqpHeaders;
 import org.springframework.messaging.handler.annotation.Header;
@@ -18,8 +19,9 @@ import java.nio.file.Path;
 
 import static com.microsoft.migration.assets.worker.config.RabbitConfig.IMAGE_PROCESSING_QUEUE;
 
-@Slf4j
 public abstract class AbstractFileProcessingService implements FileProcessor {
+    
+    private static final Logger log = LoggerFactory.getLogger(AbstractFileProcessingService.class);
 
     @RabbitListener(queues = IMAGE_PROCESSING_QUEUE)
     public void processImage(final ImageProcessingMessage message, 
