@@ -39,6 +39,18 @@ class S3ControllerTest {
     }
 
     @Test
+    void uploadObjectRejectsSpoofedImageContentType() throws Exception {
+        MockMultipartFile file = new MockMultipartFile("file", "notes.txt", "image/jpeg", "hello".getBytes());
+        RedirectAttributesModelMap redirectAttributes = new RedirectAttributesModelMap();
+
+        String view = controller.uploadObject(file, redirectAttributes);
+
+        assertEquals("redirect:/storage/upload", view);
+        assertEquals("Only image files are allowed", redirectAttributes.getFlashAttributes().get("error"));
+        verify(storageService, never()).uploadObject(any());
+    }
+
+    @Test
     void uploadObjectDoesNotExposeInternalErrors() throws Exception {
         MockMultipartFile file = new MockMultipartFile("file", "image.jpg", "image/jpeg", "hello".getBytes());
         RedirectAttributesModelMap redirectAttributes = new RedirectAttributesModelMap();

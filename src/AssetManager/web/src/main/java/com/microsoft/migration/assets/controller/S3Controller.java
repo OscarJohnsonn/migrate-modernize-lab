@@ -18,13 +18,17 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
+import java.util.Set;
 
 @Controller
 @RequestMapping("/" + StorageConstants.STORAGE_PATH)
 @RequiredArgsConstructor
 @Slf4j
 public class S3Controller {
+
+    private static final Set<String> ALLOWED_IMAGE_EXTENSIONS = Set.of(".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp");
 
     private final StorageService storageService;
 
@@ -115,6 +119,16 @@ public class S3Controller {
 
     private boolean isSupportedImageUpload(MultipartFile file) {
         String contentType = file.getContentType();
-        return contentType != null && contentType.toLowerCase().startsWith("image/");
+        if (contentType == null || !contentType.toLowerCase(Locale.ROOT).startsWith("image/")) {
+            return false;
+        }
+
+        String filename = file.getOriginalFilename();
+        if (filename == null) {
+            return false;
+        }
+
+        String lowerName = filename.toLowerCase(Locale.ROOT);
+        return ALLOWED_IMAGE_EXTENSIONS.stream().anyMatch(lowerName::endsWith);
     }
 }
